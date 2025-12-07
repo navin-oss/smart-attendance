@@ -33,7 +33,7 @@
 }
 
 /* Modern Dark */
-[data-theme="dark"] {
+[data-theme="Dark"] {
   /* Backgrounds */
   --bg-primary: #0F172A;
   /* Deep Slate/Navy background */
@@ -59,7 +59,7 @@
 }
 
 /* Forest theme */
-[data-theme="forest"] {
+[data-theme="Forest"] {
   /* Backgrounds */
   --bg-primary: #F0FDF4;
   /* Very pale mint */
@@ -82,7 +82,7 @@
 }
 
 /* Cyber tech theme */
-[data-theme="cyber"] {
+[data-theme="Cyber"] {
   /* Backgrounds */
   --bg-primary: #120B2E;
   /* Deep Violet/Black */

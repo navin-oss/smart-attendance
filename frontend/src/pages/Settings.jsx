@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { 
   Info, 
   Sliders, 
@@ -19,9 +19,11 @@ import {
   Sparkles,
   Code,
   Palette,
-  Aperture
+  Aperture,
+  TreePine
 } from "lucide-react";
 import SettingsSidebar from "../components/SettingsSidebar";
+import { useTheme } from "../theme/ThemeContext";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Thresholds");
@@ -31,7 +33,8 @@ export default function Settings() {
   const [safeVal, setSafeVal] = useState(85);
 
   // State for General
-  const [theme, setTheme] = useState("Light");
+  const {theme, setTheme} = useTheme();
+
   const [notifications, setNotifications] = useState({ push: true, inApp: true, sound: false });
 
   // State for Face Settings
@@ -67,7 +70,7 @@ export default function Settings() {
                 <div className="space-y-4">
                   <label className="text-sm font-semibold text-slate-800">Theme</label>
                   <div className="flex gap-4">
-                    {['Light', 'Dark', 'System'].map((mode) => (
+                    {['Light', 'Dark', 'Forest', 'Cyber'].map((mode) => (
                       <button
                         key={mode}
                         onClick={() => setTheme(mode)}
@@ -79,7 +82,8 @@ export default function Settings() {
                       >
                         {mode === 'Light' && <Sun size={18} />}
                         {mode === 'Dark' && <Moon size={18} />}
-                        {mode === 'System' && <Monitor size={18} />}
+                        {mode === 'Forest' && <TreePine size={18} />}
+                        {mode === 'Cyber' && <Monitor size={18} />}
                         {mode}
                       </button>
                     ))}
