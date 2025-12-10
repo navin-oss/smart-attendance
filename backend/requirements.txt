@@ -7,3 +7,10 @@ authlib
 python-dotenv
 PyJWT
 itsdangerous
+httpx
+pymongo
+email-validator
+bcrypt
+passlib[bcrypt]
+motor
+
