@@ -13,4 +13,5 @@ email-validator
 bcrypt
 passlib[bcrypt]
 motor
+python-jose
 

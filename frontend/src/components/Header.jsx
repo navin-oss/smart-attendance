@@ -1,7 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Bell, User, ChevronDown } from "lucide-react";
 
 export default function Header() {
+    const [user, setUser] = useState(null)
+
+    useEffect(()=>{
+        try{
+            const storedData = localStorage.getItem("user");
+            if(!storedData){
+                setUser(null);
+                return;
+            }
+            const parsed = JSON.parse(storedData);
+            setUser(parsed);
+        } catch(e){
+            console.error("Failed to parse user from local storage", e);
+            setUser(null);
+        }
+    }, []);
+
+    const displayName = user?.name || user?.email || "Guest";
+
   return (
     <>
     <div className="w-full h-16 flex items-center justify-start px-6 bg-[var(--bg-card)] gap-2" role="navigation">
@@ -23,7 +42,7 @@ export default function Header() {
             
             <User className="rounded-full" />
             <div className="user flex items-center gap-1.5">
-                <span className="user-name text-[var(--text-main)]">John Doe</span>
+                <span className="user-name text-[var(--text-main)]">{displayName || "John doe"}</span>
                 <a href="/settings"><ChevronDown className="cursor-pointer p-1" /></a>
             </div>
         </div>

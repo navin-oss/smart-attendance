@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { 
   Bell, 
   Shield, 
@@ -45,6 +45,7 @@ export default function StudentDashboard() {
       color: "gray"
     },
   ];
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row font-sans text-slate-800">

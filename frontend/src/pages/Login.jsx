@@ -12,19 +12,19 @@ export default function Login() {
 
   const navigate = useNavigate();
 
+  const apiUrl = import.meta.env.VITE_API_URL;
+
   // Google Login
   const googleLogin = () => {
-    window.location.href = "http://127.0.0.1:8000/auth/google";
+    window.location.href = `${apiUrl}/auth/google`;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    console.log("handle Submit called");
-
     try{
-      const res = await fetch("http://127.0.0.1:8000/auth/login", {
+      const res = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
         headers: {
           "Content-type" : "application/json",
@@ -40,7 +40,8 @@ export default function Login() {
       const data = await res.json();
       console.log(data);
 
-      if(remember) localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("token", data.token)
+      localStorage.setItem("user", JSON.stringify(data));
 
       // --- FIX: Handle role case sensitivity (Teacher/Student vs teacher/student) ---
       const userRole = data.role ? data.role.toLowerCase() : "";

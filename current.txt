@@ -1,0 +1,3 @@
+so far ->
+
+Our website fetches the teachers data which is stored in user_settings but it should be in teachers collection

@@ -55,7 +55,41 @@ async def register(payload: RegisterRequest, background_tasks: BackgroundTasks):
         user_doc["employee_id"] = payload.employee_id
         user_doc["phone"] = payload.phone
         
-    result = await db.users.insert_one(user_doc)
+    # Insert into users collection   
+    try:
+        result = await db.users.insert_one(user_doc)
+        created_user_id = result.inserted_id
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to create user") from e
+    
+    # Insert into role specific collections
+    try:
+        if payload.role == "student":
+            student_doc = {
+                "user_id": created_user_id,
+                "branch": payload.branch,
+                "created_at": datetime.utcnow(),
+            }
+            await db.students.insert_one(student_doc)
+        elif payload.role == "teacher":
+            teacher_doc = {
+                "user_id": created_user_id,
+                "employee_id": payload.employee_id,
+                "phone": payload.phone,
+                "created_at": datetime.utcnow(),
+                # add other teacher-specific fields if required
+            }
+            await db.teachers.insert_one(teacher_doc)
+            
+    except Exception as e:
+    # rollback: delete the created user to keep DB consistent
+        try:
+            await db.users.delete_one({"_id": created_user_id})
+        except Exception:
+            # if rollback deletion fails, log and raise generic error
+            # (you may want to integrate real logging here)
+            pass
+        raise HTTPException(status_code=500, detail="Failed to create role-specific record") from e
     
     # Build Verification link
     verify_link = f"{BACKEND_BASE_URL}/auth/verify-email?token={verification_token}"
@@ -94,12 +128,24 @@ async def login(payload: LoginRequest):
     # 3. Check if user is verified or not
     if not user.get("is_verified", False):
         raise HTTPException(status_code=403, detail="Please verify your email first..")
-
-    return UserResponse(
-        email=email,
+    
+    # 4. Generate JWT token
+    token = create_jwt(
+        user_id=str(user["_id"]),
         role=user["role"],
-        name=user["name"],
+        email=user["email"]
     )
+    
+    print(token)
+
+    return {
+        "userId": str(user["_id"]),
+        "email": email,
+        "role": user["role"],
+        "name": user["name"],
+        "token": token     # ← VERY IMPORTANT
+    }
+
     
     
 # Verify email route

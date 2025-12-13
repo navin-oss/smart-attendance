@@ -7,12 +7,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
+from fastapi.staticfiles import StaticFiles
+
 from .core.config import APP_NAME, ORIGINS
 
 # Routes
 from .api.routes.auth import router as auth_router
 from .api.routes.students import router as students_router
 from .api.routes.attendance import router as attendance_router
+
+from app.api.routes import teacher_settings as settings_router
 
 
 def create_app() -> FastAPI:
@@ -41,6 +45,10 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(students_router)
     app.include_router(attendance_router)
+    app.include_router(settings_router.router)
+    
+    # serve static files (avatars)
+    app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
     return app
 

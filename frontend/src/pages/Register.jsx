@@ -36,6 +36,8 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const apiUrl = import.meta.env.VITE_API_URL;
+
   const handleChange = (e) => {
     const {name, value} = e.target;
     setFormData((prev) => ({...prev, [name]: value}));
@@ -57,7 +59,7 @@ export default function Register() {
         phone: role === "teacher" ? formData.phone : undefined,
       };
 
-      const res = await fetch("http://127.0.0.1:8000/auth/register", {
+      const res = await fetch(`${apiUrl}/auth/register`, {
         method: "POST",
         headers: {"Content-Type" : "application/json"},
         body: JSON.stringify(payload)

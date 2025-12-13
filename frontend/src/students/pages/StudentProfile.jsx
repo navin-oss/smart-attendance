@@ -1,4 +1,6 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchMyStudentProfile } from "../../api/auth.js";
 import { 
   ArrowLeft, 
   Upload, 
@@ -18,6 +20,22 @@ import StudentNavigation from "../components/StudentNavigation"
 import { Link } from "react-router-dom";
 
 export default function StudentProfile() {
+  const {data, isLoading, isError, error} = useQuery({
+    queryKey: ["myStudentProfile"],
+    queryFn: fetchMyStudentProfile,
+    retry: false,
+  });
+
+  if (isLoading) return <div>Loading Profile...</div>;
+  if (isError){
+    return <div>Error loading profile: {error?.message || "Please login"}</div>;
+  }
+  if(!data) return <div>No Profile found..</div>;
+
+  const {student, class: classDoc, professor, attendance_summary} = data;
+  console.log(data)
+
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col md:flex-row font-sans text-slate-800">
       
@@ -61,9 +79,9 @@ export default function StudentProfile() {
               <div className="flex-1 text-center sm:text-left space-y-2 w-full">
                 <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900">Ananya Sharma</h3>
+                    <h3 className="text-xl font-bold text-slate-900">{data.name || "John"}</h3>
                     <div className="flex items-center justify-center sm:justify-start gap-2 mt-1">
-                      <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Roll no: 21CS045</span>
+                      <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Roll no: {data.roll || "21CS045"}</span>
                       <span className="text-sm text-slate-500">Computer Science</span>
                     </div>
                   </div>
@@ -76,15 +94,15 @@ export default function StudentProfile() {
                 <div className="flex flex-wrap justify-center sm:justify-start gap-4 text-sm text-slate-600 pt-2">
                   <div className="flex items-center gap-1">
                     <span className="text-slate-400">Year:</span>
-                    <span className="font-medium text-slate-800">3rd year</span>
+                    <span className="font-medium text-slate-800">{data.year || "1st"}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="text-slate-400">Branch:</span>
-                    <span className="font-medium text-slate-800">CSE</span>
+                    <span className="font-medium text-slate-800">{(data.branch).toUpperCase()}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="text-slate-400">Email:</span>
-                    <span className="font-medium text-slate-800">ananya@example.edu</span>
+                    <span className="font-medium text-slate-800">{data.email || "ananya@example.edu"}</span>
                   </div>
                 </div>
               </div>
@@ -120,21 +138,25 @@ export default function StudentProfile() {
             <div className="space-y-2">
               <div className="flex justify-between items-end text-sm mb-1">
                 <span className="text-slate-500 font-medium">Overall percentage</span>
-                <span className="font-bold text-slate-900 text-lg">82%</span>
+                <span className="font-bold text-slate-900 text-lg">{data.attendance.percentage}</span>
               </div>
               <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-[#10B981] w-[82%] rounded-full"></div>
+                <div
+                  className={`h-full bg-[#10B981] rounded-full`}
+                  style={{ width: `${data.attendance.percentage}%` }}
+                ></div>
+
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div>
                 <p className="text-xs text-slate-400 uppercase font-bold tracking-wide">Classes attended</p>
-                <p className="text-xl font-bold text-slate-800 mt-1">82</p>
+                <p className="text-xl font-bold text-slate-800 mt-1">{data.attendance.present}</p>
               </div>
               <div>
                 <p className="text-xs text-slate-400 uppercase font-bold tracking-wide">Total conducted</p>
-                <p className="text-xl font-bold text-slate-800 mt-1">100</p>
+                <p className="text-xl font-bold text-slate-800 mt-1">{data.attendance.present + data.attendance.absent}</p>
               </div>
             </div>
 
@@ -160,7 +182,7 @@ export default function StudentProfile() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              {['Data Structures', 'Operating Systems', 'Computer Networks'].map((sub) => (
+              {data.subjects.map((sub) => (
                 <div key={sub} className="bg-blue-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 shadow-sm shadow-blue-200">
                   <BookOpen size={14} className="opacity-80" />
                   {sub}

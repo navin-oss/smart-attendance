@@ -21,6 +21,7 @@ import OAuthCallback from "./pages/OAuthCallback.jsx";
 function RedirectToHome() {
   const storedUser = localStorage.getItem("user");
   const user = storedUser ?  JSON.parse(storedUser) : null;
+  console.log(storedUser)
 
   if(!user) return <Navigate to={"/login"} />
 

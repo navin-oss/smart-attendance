@@ -8,9 +8,11 @@ class LoginRequest(BaseModel):
 
 
 class UserResponse(BaseModel):
+    userId: str
     email: str
     role: str
     name: str
+    token: str
 
 class RegisterRequest(BaseModel):
     role: str

@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import SettingsSidebar from "../components/SettingsSidebar";
 import { useTheme } from "../theme/ThemeContext";
+import {getSettings, patchSettings, uploadAvatar} from "../api/settings"
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Thresholds");
@@ -32,17 +33,170 @@ export default function Settings() {
   const [warningVal, setWarningVal] = useState(75);
   const [safeVal, setSafeVal] = useState(85);
 
-  // State for General
+  // State for Theme
   const {theme, setTheme} = useTheme();
 
+  // Notifications
   const [notifications, setNotifications] = useState({ push: true, inApp: true, sound: false });
 
   // State for Face Settings
   const [liveness, setLiveness] = useState(true);
   const [sensitivity, setSensitivity] = useState(80);
 
+  // State for email preff
+  const [emailPreferences, setEmailPreferences] = useState(false)
+
+  // --- helper functions (inside your component) ---
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
+  // compute initials for avatar fallback
+  function getInitials(name) {
+    if (!name) return "AJ";
+    return name.split(" ").map(s => s[0]?.toUpperCase()).slice(0,2).join("");
+  }
+
+  const [profile, setProfile] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    role: "",
+    subjects: [],
+    avatarUrl: null,
+  });
+
+  const [loaded, setLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(null);
+
+  useEffect(() => {
+  let mounted = true;
+
+  async function load() {
+    try {
+      setLoadError(null);
+      setLoaded(false);
+      const data = await getSettings(); // your API helper
+
+      console.log("GET /api/settings response:", data);
+
+      if (!mounted) return;
+
+      setProfile({
+        name: data?.profile?.name ?? "",
+        email: data?.profile?.email ?? "",
+        phone: data?.profile?.phone ?? "",
+        role: data?.profile?.role ?? "",
+        subjects: data?.profile?.subjects ?? [],
+        avatarUrl: data?.profile?.avatarUrl ?? null,
+      });
+
+      setTheme(data?.theme ?? "Light");
+
+      setNotifications({
+        push: data?.notifications?.push ?? true,
+        inApp: data?.notifications?.inApp ?? true,
+        sound: data?.notifications?.sound ?? false,
+      });
+
+      setEmailPreferences(data?.emailPreferences ?? []);
+
+      setWarningVal(data?.thresholds?.warningVal ?? 75);
+      setSafeVal(data?.thresholds?.safeVal ?? 85);
+
+      setSensitivity(data?.faceSettings?.sensitivity ?? 80);
+      setLiveness(data?.faceSettings?.liveness ?? true);
+
+    } catch (err) {
+      console.error("Settings load failed:", err);
+      if (mounted) setLoadError(err.message || String(err));
+    } finally {
+      // always clear loading so UI can render either data or error
+      if (mounted) setLoaded(true);
+    }
+  }
+
+  load();
+  return () => { mounted = false; };
+}, [setTheme]);
+
+  useEffect(() => {
+    if (loaded) console.log("Profile loaded:", profile);
+  }, [loaded, profile]);
+
+  // called when Save changes is pressed
+  async function saveProfile() {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const payload = {
+        profile: {
+          name: profile.name,
+          email: profile.email,
+          phone: profile.phone,
+          role: profile.role,
+          subjects: profile.subjects,
+          avatarUrl: profile.avatarUrl,
+        }
+      };
+      const updated = await patchSettings(payload); // your API helper
+      // update local profile from server response (server returns serialized doc)
+      const serverProfile = updated.profile ?? updated.settings?.profile ?? null;
+      if (serverProfile) {
+        setProfile({
+          name: serverProfile.name ?? "",
+          email: serverProfile.email ?? "",
+          phone: serverProfile.phone ?? "",
+          role: serverProfile.role ?? "",
+          subjects: serverProfile.subjects ?? [],
+          avatarUrl: serverProfile.avatarUrl ?? null,
+        });
+      }
+      // optional: show toast success
+    } catch (err) {
+      console.error("Save profile failed", err);
+      setSaveError(err.message || "Failed to save profile");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // subject handlers
+  function addSubject(){
+    const subject = prompt("Enter subject name");
+    if(!subject) return;
+    setProfile(prev => ({...prev, subjects: [...prev.subjects, subject]}));
+  }
+  function removeSubject(idx){
+    setProfile(prev => ({...prev, subjects: prev.subjects.filter((_,i) => i != idx)}));
+  }
+
+  // avatar upload handler
+  async function onAvatarSelected(e) {
+    const file = e.target.files?.[0];
+    if(!file) return;
+    try{
+      const objectUrl = URL.createObjectURL(file);
+      setProfile(prev => ({...prev, avatarUrl: objectUrl}));
+      const res = await uploadAvatar(file);
+
+      setProfile(prev => ({...prev , avatarUrl: res.avatarUrl ?? prev.avatarUrl}));
+    } catch(err){
+      console.error("Avatar upload failed");
+      setSaveError("Avatar Upload Failed");
+    }
+  }
+
+  // UI: show a simple loading state until data is loaded
+  if (!loaded) {
+    return <div className="p-6">Loading settings…</div>;
+  }
+
+  if (!loaded) return <div className="p-6">Loading settings…</div>;
+  if (loadError) return <div className="p-6 text-rose-600">Failed to load settings: {loadError}</div>;
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
+
 
       <div className="max-w-7xl mx-auto p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
         
@@ -216,56 +370,109 @@ export default function Settings() {
                 </div>
 
                 <div className="flex items-center gap-6 p-6 bg-slate-50 rounded-xl border border-gray-100">
-                  <div className="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-2xl font-bold text-slate-500 border-4 border-white shadow-sm">
-                    AJ
+                  <div className="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-2xl font-bold text-slate-500 border-4 border-white shadow-sm overflow-hidden">
+                    {profile.avatarUrl
+                      ? <img src={profile.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                      : <span>{getInitials(profile.name)}</span>
+                    }
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-lg font-bold text-slate-800">Alex Johnson</h4>
-                    <p className="text-sm text-slate-500">Department of Computer Science</p>
+                    <h4 className="text-lg font-bold text-slate-800">{profile.name || "-"}</h4>
+                    <p className="text-sm text-slate-500">{profile.role || "Department of Science"}</p>
                   </div>
-                  <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-gray-50 transition shadow-sm cursor-pointer">
+                  <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-gray-50 transition shadow-sm cursor-pointer">
                     <Upload size={16} />
-                    Change photo
-                  </button>
+                    <span>Change photo</span>
+                    <input type="file" accept="image/*" onChange={onAvatarSelected} className="hidden" />
+                  </label>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700">Full Name</label>
-                    <input type="text" defaultValue="Alex Johnson" className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700" />
+                    <input 
+                      type="text" 
+                      value={profile.name}
+                      onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))} 
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700" 
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700">Role</label>
-                    <input type="text" defaultValue="Assistant Professor" className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700" />
+                    <input type="text" value={profile.role} onChange={(e) => setProfile(prev => ({ ...prev, role: e.target.value }))} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700">Email Address</label>
-                    <input type="email" defaultValue="alex.johnson@university.edu" className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700" />
+                    <input type="email" value={profile.email} onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-700">Phone Number</label>
-                    <input type="tel" defaultValue="+91 98765 43210" className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700" />
+                    <input type="tel" value={profile.phone} onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700" />
                   </div>
                 </div>
 
                 <div className="space-y-3">
                    <label className="text-sm font-semibold text-slate-700">Subjects Taught</label>
                    <div className="flex flex-wrap gap-2">
-                      {['Data Structures (CS201)', 'Operating Systems (CS204)', 'Algorithms (CS305)'].map(sub => (
-                        <div key={sub} className="px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-full text-sm font-medium flex items-center gap-2">
-                          {sub}
-                          <button className="hover:text-indigo-900"><X size={14}/></button>
-                        </div>
-                      ))}
-                      <button className="px-3 py-1.5 border border-dashed border-gray-300 text-gray-500 rounded-full text-sm font-medium hover:border-indigo-400 hover:text-indigo-600 flex items-center gap-1 transition cursor-pointer">
+                      {profile.subjects && profile.subjects.length > 0 ? (
+                        profile.subjects.map((sub, idx) => (
+                          <div key={idx} className="px-3 py-1.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-full text-sm font-medium flex items-center gap-2">
+                            <span>{sub}</span>
+                            <button
+                              onClick={() => removeSubject(idx)}
+                              className="hover:text-indigo-900"
+                              type="button"
+                              aria-label={`Remove ${sub}`}
+                            >
+                              <X size={14}/>
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-sm text-slate-500">No subjects added</div>
+                      )}
+                      <button onClick={addSubject} className="px-3 py-1.5 border border-dashed border-gray-300 text-gray-500 rounded-full text-sm font-medium hover:border-indigo-400 hover:text-indigo-600 flex items-center gap-1 transition cursor-pointer">
                         <Plus size={14} /> Add subject
                       </button>
                    </div>
                 </div>
+                {saveError && <div className="text-sm text-rose-600">{saveError}</div>}
 
                 <div className="pt-6 flex justify-end gap-3 border-t border-gray-100">
-                  <button className="px-6 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 border border-gray-200 cursor-pointer">Cancel</button>
-                  <button className="px-8 py-2.5 rounded-xl text-sm font-semibold bg-[#4F46E5] text-white hover:bg-[#4338ca] shadow-md cursor-pointer">Save changes</button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // reset to last loaded server profile if you saved it in state 'loadedProfile' or reload from server
+                      // For now we simply reload by calling getSettings again:
+                      (async () => {
+                        try {
+                          const fresh = await getSettings();
+                          setProfile({
+                            name: fresh.profile?.name ?? "",
+                            email: fresh.profile?.email ?? "",
+                            phone: fresh.profile?.phone ?? "",
+                            role: fresh.profile?.role ?? "",
+                            subjects: fresh.profile?.subjects ?? [],
+                            avatarUrl: fresh.profile?.avatarUrl ?? null,
+                          });
+                        } catch (e) {
+                          console.error("Reload failed", e);
+                        }
+                      })();
+                    }}
+                    className="px-6 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 border border-gray-200 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={saveProfile}
+                    disabled={saving}
+                    className={`px-8 py-2.5 rounded-xl text-sm font-semibold text-white ${saving ? 'bg-gray-400' : 'bg-[#4F46E5] hover:bg-[#4338ca]'} shadow-md cursor-pointer`}
+                  >
+                    {saving ? "Saving..." : "Save changes"}
+                  </button>
                 </div>
               </div>
             )}
