@@ -287,12 +287,12 @@ MONGO_URI=mongodb://localhost:27017
 MONGO_DB=smart_attendance
 
 # JWT Configuration
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_SECRET=your-secret-key-here  # Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
 JWT_ALGORITHM=HS256
 JWT_EXPIRES_MINUTES=60
 
 # Session Configuration
-SESSION_SECRET_KEY=your-session-secret-key-change-this-in-production
+SESSION_SECRET_KEY=your-secret-key-here  # Generate with: python -c "import secrets; print(secrets.token_urlsafe(32))"
 
 # Email Configuration (for notifications)
 SMTP_HOST=smtp.gmail.com
@@ -1237,7 +1237,7 @@ Want to see your name here? Check out our [Contributing Guide](#-contributing)!
 
 Special thanks to:
 
-- **GirlScript Summer of Code (GSSoC) 2025** for supporting this project
+- **GirlScript Summer of Code (GSSoC)** for supporting this project
 - **FastAPI** team for the amazing framework
 - **React** team for the powerful UI library
 - **face_recognition** library by Adam Geitgey
