@@ -1,15 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Bell, User, ChevronDown } from "lucide-react";
-import { useUser, UserButton } from "@clerk/clerk-react";
-
-// Helper function to get user display name
-const getUserDisplayName = (user) => {
-  return user?.fullName || user?.primaryEmailAddress?.emailAddress || "Guest";
-};
 
 export default function Header() {
-    const { user, isLoaded } = useUser();
-    const displayName = getUserDisplayName(user);
+    const [user, setUser] = useState(null)
+
+    useEffect(()=>{
+        try{
+            const storedData = localStorage.getItem("user");
+            if(!storedData){
+                setUser(null);
+                return;
+            }
+            const parsed = JSON.parse(storedData);
+            setUser(parsed);
+        } catch(e){
+            console.error("Failed to parse user from local storage", e);
+            setUser(null);
+        }
+    }, []);
+
+    const displayName = user?.name || user?.email || "Guest";
 
   return (
     <>
@@ -30,32 +40,13 @@ export default function Header() {
                 <Bell className="text-[var(--text-on-primary)] cursor-pointer p-0.5"/>
             </div>
             
-            {isLoaded && user ? (
-                <>
-                    <div className="user flex items-center gap-1.5">
-                        <span className="user-name text-[var(--text-main)]">{displayName}</span>
-                        <UserButton 
-                            afterSignOutUrl="/login"
-                            appearance={{
-                                elements: {
-                                    avatarBox: "w-8 h-8"
-                                }
-                            }}
-                        />
-                    </div>
-                </>
-            ) : (
-                <>
-                    <User className="rounded-full" />
-                    <div className="user flex items-center gap-1.5">
-                        <span className="user-name text-[var(--text-main)]">Guest</span>
-                        <a href="/settings"><ChevronDown className="cursor-pointer p-1" /></a>
-                    </div>
-                </>
-            )}
+            <User className="rounded-full" />
+            <div className="user flex items-center gap-1.5">
+                <span className="user-name text-[var(--text-main)]">{displayName || "John doe"}</span>
+                <a href="/settings"><ChevronDown className="cursor-pointer p-1" /></a>
+            </div>
         </div>
     </div>
       
     </>
-  );
-}
+  );}

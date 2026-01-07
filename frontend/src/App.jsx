@@ -1,7 +1,6 @@
 // frontend/src/App.jsx
 import React from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useUser } from "@clerk/clerk-react";
+import { Routes, Route, Link, useLocation, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import MarkAttendance from "./pages/MarkAttendance";
 import StudentList from "./pages/StudentList";
@@ -17,49 +16,22 @@ import StudentDashboard from "./students/pages/StudentDashboard.jsx"
 import StudentSubjects from "./students/pages/StudentSubjects.jsx";
 import StudentForecast from "./students/pages/StudentForecast.jsx";
 import StudentProfile from "./students/pages/StudentProfile.jsx"
-
-// Protected Route component
-function ProtectedRoute({ children }) {
-  const { isSignedIn, isLoaded } = useUser();
-  
-  if (!isLoaded) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-  
-  if (!isSignedIn) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  return children;
-}
+import OAuthCallback from "./pages/OAuthCallback.jsx";
 
 function RedirectToHome() {
-  const { user, isSignedIn, isLoaded } = useUser();
-  
-  if (!isLoaded) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ?  JSON.parse(storedUser) : null;
+  console.log(storedUser)
 
-  if (!isSignedIn) {
-    return <Navigate to="/login" />;
-  }
+  if(!user) return <Navigate to={"/login"} />
 
-  // Get role from user's metadata
-  // publicMetadata is accessible on the client and should be used for role
-  // unsafeMetadata is checked as fallback for compatibility during migration
-  const userRole = user?.publicMetadata?.role || user?.unsafeMetadata?.role;
+  if(user.role === "teacher") return <Navigate to={"/dashboard"} />
+  if(user.role === "student") return <Navigate to={"/student-dashboard"} />
 
-  if (userRole === "teacher") {
-    return <Navigate to="/dashboard" />;
-  }
-  
-  if (userRole === "student") {
-    return <Navigate to="/student-dashboard" />;
-  }
-
-  // Default redirect if no role is set
-  return <Navigate to="/dashboard" />;
+  return <Navigate to={"/login"} />
 }
+
+
 
 const studentRoutes = [
   "/student-dashboard",
@@ -75,6 +47,8 @@ export default function App() {
   const location = useLocation();
 
   const hideNavbar = studentRoutes.includes(location.pathname);
+  
+
 
   return (
     <div className="min-h-screen">
@@ -83,25 +57,25 @@ export default function App() {
       <div className="p-6">
         <Routes>
           <Route path="/" element={<RedirectToHome/>} />
+          <Route path="/dashboard" element={<Dashboard/>} />
+          <Route path="/attendance" element={<MarkAttendance/>}/>
+          <Route path="/students" element={<StudentList/>}/>
+          <Route path="/analytics" element={<Analytics/>}/>
+          <Route path="/reports" element={<Reports/>}/>
+          <Route path="/settings" element={<Settings/>}/>
+          <Route path="/add-students" element={<AddStudents/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/register" element={<Register/>}/>
-          
-          {/* Protected Teacher Routes */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
-          <Route path="/attendance" element={<ProtectedRoute><MarkAttendance/></ProtectedRoute>}/>
-          <Route path="/students" element={<ProtectedRoute><StudentList/></ProtectedRoute>}/>
-          <Route path="/analytics" element={<ProtectedRoute><Analytics/></ProtectedRoute>}/>
-          <Route path="/reports" element={<ProtectedRoute><Reports/></ProtectedRoute>}/>
-          <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>}/>
-          <Route path="/add-students" element={<ProtectedRoute><AddStudents/></ProtectedRoute>}/>
-          
-          {/* Protected Student Routes */}
-          <Route path="/student-dashboard" element={<ProtectedRoute><StudentDashboard/></ProtectedRoute>}/>
-          <Route path="/student-subjects" element={<ProtectedRoute><StudentSubjects/></ProtectedRoute>}/>
-          <Route path="/student-forecast" element={<ProtectedRoute><StudentForecast/></ProtectedRoute>}/>
-          <Route path="/student-profile" element={<ProtectedRoute><StudentProfile/></ProtectedRoute>}/>
-
           <Route path="*" element={<div>404 Not Found</div>} />
+
+          {/* Students routes */}
+          <Route path="/student-dashboard" element={<StudentDashboard/>}/>
+          <Route path="/student-subjects" element={<StudentSubjects/>}/>
+          <Route path="/student-forecast" element={<StudentForecast/>}/>
+          <Route path="/student-profile" element={<StudentProfile/>}/>
+
+          <Route path="/oauth-callback" element={<OAuthCallback />} />
+
         </Routes>
       </div>
     </div>

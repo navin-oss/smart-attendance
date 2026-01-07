@@ -25,7 +25,7 @@ Smart Attendance is a modern, intelligent attendance management system designed 
 - ⏱️ **Save Time**: Automated attendance marking reduces manual work
 - 🎯 **Improve Accuracy**: AI-powered facial recognition eliminates errors
 - 📊 **Gain Insights**: Real-time analytics and predictive forecasting
-- 🔐 **Stay Secure**: Modern Clerk authentication with email and Google OAuth
+- 🔐 **Stay Secure**: OAuth 2.0 authentication with Google Sign-In
 - 📱 **Access Anywhere**: Responsive design works on all devices
 
 ---
@@ -69,7 +69,7 @@ Smart Attendance is a modern, intelligent attendance management system designed 
 - **📧 Email Notifications**: Send automated alerts to students with poor attendance
 - **📅 Attendance Reports**: Generate and export detailed attendance reports
 - **⚙️ Teacher Settings**: Customize notification preferences and profile settings
-- **🔐 Clerk Authentication**: Secure authentication with email/password and Google OAuth via Clerk
+- **🔐 Google OAuth Login**: Secure authentication with Google Sign-In
 
 ### 🎓 For Students
 
@@ -84,7 +84,7 @@ Smart Attendance is a modern, intelligent attendance management system designed 
 
 - **🎨 Theme Support**: Multiple theme options (Light, Dark, Soft) for better user experience
 - **📱 Responsive Design**: Seamlessly works across desktop, tablet, and mobile devices
-- **🔐 Clerk Authentication**: Modern authentication with email/password and social login (Google)
+- **🌐 OAuth 2.0 Authentication**: Secure login with Google integration
 - **💾 Cloud Storage**: Profile pictures stored securely on Cloudinary
 - **🗄️ MongoDB Database**: Scalable and flexible data storage
 - **🚀 High Performance**: Built with FastAPI for lightning-fast API responses
@@ -99,7 +99,6 @@ Smart Attendance is a modern, intelligent attendance management system designed 
 |-----------|---------|---------|
 | **React** | 19.2.0 | Modern UI library for building interactive interfaces |
 | **React Router DOM** | 7.9.6 | Client-side routing and navigation |
-| **Clerk** | Latest | Modern authentication with email and social login |
 | **Vite** | 7.2.4 | Lightning-fast build tool and dev server |
 | **Tailwind CSS** | 4.1.17 | Utility-first CSS framework for styling |
 | **Material-UI** | 7.3.5 | React UI component library |
@@ -303,6 +302,11 @@ SMTP_PASS=your-app-specific-password
 BACKEND_BASE_URL=http://127.0.0.1:8000
 FRONTEND_BASE_URL=http://localhost:5173
 
+# Google OAuth Configuration
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/auth/google/callback
+
 # Cloudinary Configuration (for image storage)
 CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
 CLOUDINARY_API_KEY=your-cloudinary-api-key
@@ -315,31 +319,18 @@ STUDENT_EMAIL=student@gmail.com
 STUDENT_PASSWORD=student123
 ```
 
-#### Frontend (.env)
-
-Create a `.env` file in the `frontend` directory:
-
-```env
-# Clerk Authentication (Required)
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
-
-# Backend API URL
-VITE_API_URL=http://localhost:8000
-```
-
 #### Important Notes:
 
-1. **Clerk Authentication**: 
-   - Sign up at [Clerk](https://clerk.com/)
-   - Create a new application
-   - Enable Email and Google OAuth providers
-   - Copy your Publishable Key from the API Keys section
-   - See `frontend/CLERK_SETUP.md` for detailed setup instructions
-
-2. **JWT_SECRET**: Generate a strong random secret:
+1. **JWT_SECRET**: Generate a strong random secret:
    ```bash
    python -c "import secrets; print(secrets.token_urlsafe(32))"
    ```
+
+2. **Google OAuth**: 
+   - Create a project in [Google Cloud Console](https://console.cloud.google.com/)
+   - Enable Google+ API
+   - Create OAuth 2.0 credentials
+   - Add authorized redirect URIs
 
 3. **Gmail SMTP**: 
    - Enable 2-factor authentication on your Gmail account
@@ -360,10 +351,8 @@ VITE_API_URL=http://localhost:8000
 
 - Navigate to `http://localhost:5173`
 - Click **"Login"** or **"Register"**
-- Sign in with Clerk authentication:
-  - Use email/password authentication
-  - Or click "Continue with Google" for Google OAuth
-- After sign-up, set your role in your Clerk profile metadata (see CLERK_SETUP.md)
+- Sign in with Google OAuth or use email/password
+- Select **"Teacher"** role during registration
 
 #### 2. Dashboard Overview
 
@@ -434,10 +423,8 @@ After logging in, you'll see:
 
 - Navigate to `http://localhost:5173`
 - Click **"Login"** or **"Register"**
-- Sign in with Clerk authentication:
-  - Use email/password authentication
-  - Or click "Continue with Google" for Google OAuth
-- After sign-up, set your role in your Clerk profile metadata (see CLERK_SETUP.md)
+- Sign in with Google OAuth or use email/password
+- Select **"Student"** role during registration
 
 #### 2. Student Dashboard
 
@@ -689,24 +676,63 @@ http://localhost:8000
 
 ### Authentication
 
-Authentication is now handled by Clerk on the frontend. The backend API endpoints may still require authentication tokens for certain operations. Clerk provides secure JWT tokens that can be used to authenticate API requests.
-
-To get a user's session token in a Clerk-authenticated app:
-```javascript
-const { getToken } = useAuth();
-const token = await getToken();
-// Use token in Authorization header
+All protected endpoints require a JWT token in the Authorization header:
 ```
-
-All protected endpoints require a token in the Authorization header:
-```
-Authorization: Bearer <your-clerk-jwt-token>
-```
-
-**Note:** The legacy `/api/auth/register` and `/api/auth/login` endpoints are now replaced by Clerk's authentication flow. Users sign up and log in through Clerk's UI components.
+Authorization: Bearer <your-jwt-token>
 ```
 
 ### API Endpoints
+
+#### Authentication
+
+##### Register User
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "securepassword",
+  "name": "John Doe",
+  "role": "teacher"  // or "student"
+}
+```
+
+##### Login
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "token_type": "bearer",
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "role": "teacher"
+  }
+}
+```
+
+##### Google OAuth Login
+```http
+GET /auth/google/login
+```
+Redirects to Google OAuth consent screen.
+
+##### Google OAuth Callback
+```http
+GET /auth/google/callback?code=<authorization-code>
+```
 
 #### Students
 
@@ -1026,9 +1052,11 @@ Please read our [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines on:
 Smart Attendance implements several security measures:
 
 ✅ **Implemented:**
-- Modern authentication via Clerk (email/password and Google OAuth)
-- Secure session management with Clerk
+- JWT-based authentication
+- OAuth 2.0 integration with Google
+- Password hashing with bcrypt
 - CORS protection
+- Session management
 - Input validation with Pydantic
 - Secure environment variable storage
 - HTTPS support (in production)
