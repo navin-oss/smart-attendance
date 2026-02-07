@@ -27,11 +27,19 @@ class Config:
 
 settings = Settings()
 
-SMTP_HOST = os.getenv("SMTP_HOST")
-SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
-SMTP_USER = os.getenv("SMTP_USER")
-SMTP_PASS = os.getenv("SMTP_PASS")
+# SMTP_HOST = os.getenv("SMTP_HOST")
+# SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
+# SMTP_USER = os.getenv("SMTP_USER")
+# SMTP_PASS = os.getenv("SMTP_PASS")
+
 BACKEND_BASE_URL = os.getenv("BACKEND_BASE_URL")
+
+class BrevoSettings(BaseSettings):
+    BREVO_API_KEY:str=os.getenv("BREVO_API_KEY")
+    BREVO_SENDER_EMAIL:str=os.getenv("BREVO_SENDER_EMAIL")
+    BREVO_SENDER_NAME:str=os.getenv("BREVO_SENDER_NAME")
+    
+brevo_settings=BrevoSettings()
 
 # ML Service Configuration
 ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "http://localhost:8001")

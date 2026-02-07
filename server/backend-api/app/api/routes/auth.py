@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks, Query, Depends, R
 from fastapi.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuth
 from bson import ObjectId
-from datetime import datetime, timedelta,UTC
+from datetime import datetime, timedelta,UTC,timezone
 import secrets
 import os
 from app.utils.jwt_token import create_jwt
@@ -10,7 +10,8 @@ from urllib.parse import quote
 
 from ...schemas.auth import RegisterRequest, UserResponse, LoginRequest
 from ...core.security import hash_password, verify_password
-from ...core.email import send_verification_email
+# from ...core.email import send_verification_email
+from ...core.email import BrevoEmailService
 from ...core.config import BACKEND_BASE_URL
 from ...db.mongo import db
 
@@ -119,9 +120,15 @@ async def register(payload: RegisterRequest, background_tasks: BackgroundTasks):
     # Build Verification link
     verify_link = f"{BACKEND_BASE_URL}/auth/verify-email?token={verification_token}"
     
-    send_verification_email(
-        to_email=payload.email,
-        verification_link=verify_link,
+    # send_verification_email(
+    #     to_email=payload.email,
+    #     verification_link=verify_link,
+    # )
+    background_tasks.add_task(
+         BrevoEmailService.send_verification_email,
+         payload.email,
+         payload.name,
+         verify_link
     )
 
     token = create_jwt(
@@ -185,8 +192,11 @@ async def verify_email(token: str = Query(...)):
     
     # Check expiry
     expires_at = user.get("verification_expiry")
-    if expires_at and expires_at <  datetime.now(UTC):
-        raise HTTPException(status_code=400, detail="Verification link expired")
+    if expires_at:
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at and expires_at <  datetime.now(UTC):
+            raise HTTPException(status_code=400, detail="Verification link expired")
     
     await db.users.update_one(
         {"_id": user["_id"]},
