@@ -46,9 +46,15 @@ export default function App() {
 
   const hideNavbar = hideNavbarRoutes.includes(location.pathname);
 
+  const toggleMenu = () => {
+  setIsOpen(!isOpen);
+};
+const handleThemeToggle = () => {
+  setTheme(theme === "dark" ? "light" : "dark");
+};
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
-      {!hideNavbar && <Header theme={theme} setTheme={setTheme} />}
+      {!hideNavbar && <Header />}
 
       <main>
         <Routes>

@@ -11,7 +11,7 @@ const navLinks = [
   { to: "/manage-schedule", label: "Schedule" },
 ];
 
-export default function Header() {
+export default function Header({ theme, setTheme}) {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
