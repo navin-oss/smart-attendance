@@ -55,7 +55,7 @@ const handleThemeToggle = () => {
 };
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
-      {!hideNavbar && <Header />}
+      {!hideNavbar && <Header theme={theme} setTheme={setTheme} />}
 
       <main>
         <Routes>
