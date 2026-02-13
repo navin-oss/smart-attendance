@@ -14,6 +14,13 @@ class UserResponse(BaseModel):
     name: str
     college_name: str
     token: str
+    
+class RegisterResponse(BaseModel):
+    user_id: str
+    email: str
+    role: str
+    name: str
+    college_name: str
 
 
 class RegisterRequest(BaseModel):
