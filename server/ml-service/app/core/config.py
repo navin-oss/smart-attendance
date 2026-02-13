@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     SERVICE_NAME: str = "ML Service"
     SERVICE_VERSION: str = "1.0.0"
 
+    ML_SERVICE_HOST: str = "0.0.0.0"
+    ML_SERVICE_PORT: int = 8001
+    BACKEND_API_URL: str = "http://localhost:8000"
+
     HOST: str = "0.0.0.0"
     PORT: int = 8001
 

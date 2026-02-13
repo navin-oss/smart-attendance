@@ -538,85 +538,28 @@ After logging in, view:
 
 ## 🐳 Docker Deployment
 
-### Using Docker Compose (Recommended)
+We provide a specialized Docker setup for both development and production environments.
 
-Create a `docker-compose.yml` file in the root directory:
+For detailed instructions, please see [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md).
 
-```yaml
-version: '3.8'
-
-services:
-  mongodb:
-    image: mongo:latest
-    container_name: smart-attendance-mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: smart_attendance
-
-  backend:
-    build: ./backend
-    container_name: smart-attendance-backend
-    ports:
-      - "8000:8000"
-    depends_on:
-      - mongodb
-    environment:
-      MONGO_URI: mongodb://mongodb:27017
-      MONGO_DB: smart_attendance
-    env_file:
-      - ./backend/.env
-    volumes:
-      - ./backend:/app
-
-  frontend:
-    build: ./frontend
-    container_name: smart-attendance-frontend
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
-    environment:
-      VITE_API_URL: http://localhost:8000
-
-volumes:
-  mongodb_data:
-```
-
-#### Run with Docker Compose
+### Quick Start (Development)
 
 ```bash
-# Build and start all services
-docker-compose up -d
+# Using Makefile
+make dev
 
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
-
-# Stop and remove volumes
-docker-compose down -v
+# Or using Docker Compose directly
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
-### Using Individual Docker Commands
-
-#### Backend
+### Quick Start (Production)
 
 ```bash
-cd backend
-docker build -t smart-attendance-backend .
-docker run -p 8000:8000 --env-file .env smart-attendance-backend
-```
+# Using Makefile
+make prod
 
-#### Frontend
-
-```bash
-cd frontend
-docker build -t smart-attendance-frontend .
-docker run -p 5173:5173 smart-attendance-frontend
+# Or using Docker Compose directly
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 ---
