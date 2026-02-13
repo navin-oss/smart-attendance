@@ -11,9 +11,15 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Assign PR author to themselves
-        run: |
-          gh pr edit ${{ github.event.pull_request.number }} \
-            --add-assignee ${{ github.actor }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Assign PR author
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              assignees: [pr.user.login],
+            });
