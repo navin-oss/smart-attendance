@@ -46,6 +46,12 @@ async def register(payload: RegisterRequest, background_tasks: BackgroundTasks):
     verification_token = secrets.token_urlsafe(32)
     verification_expiry = datetime.now(UTC) + timedelta(hours=24)
 
+    if len(payload.password.encode("utf-8")) > 72:
+        raise HTTPException(
+            status_code=400,
+            detail="Password too long. Please use at most 72 characters",
+        )
+
     user_doc = {
         "name": payload.name,
         "email": payload.email,
