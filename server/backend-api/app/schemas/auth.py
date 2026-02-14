@@ -43,7 +43,7 @@ class ResetPasswordResponse(BaseModel):
 
 class LoginRequest(BaseModel):
     email: str
-    password: str
+    password: constr(max_length=72)
 
 
 class UserResponse(BaseModel):
