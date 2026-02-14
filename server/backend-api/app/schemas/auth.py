@@ -2,6 +2,45 @@ from pydantic import BaseModel, EmailStr, constr
 from typing import Optional
 
 
+# ----- Forgot Password flow (Issue #196) -----
+
+
+class ForgotPasswordRequest(BaseModel):
+    """Request body for POST /auth/forgot-password."""
+    email: EmailStr
+
+
+class ForgotPasswordResponse(BaseModel):
+    """Response for forgot-password (generic success to avoid email enumeration)."""
+    message: str = "If an account exists with this email, you will receive an OTP shortly."
+
+
+class VerifyOtpRequest(BaseModel):
+    """Request body for POST /auth/verify-otp."""
+    email: EmailStr
+    otp: constr(min_length=6, max_length=6, pattern=r"^\d{6}$")
+
+
+class VerifyOtpResponse(BaseModel):
+    """Response for verify-otp."""
+    message: str = "OTP verified successfully."
+
+
+class ResetPasswordRequest(BaseModel):
+    """Request body for POST /auth/reset-password."""
+    email: EmailStr
+    otp: constr(min_length=6, max_length=6, pattern=r"^\d{6}$")
+    new_password: constr(min_length=6, max_length=72)
+
+
+class ResetPasswordResponse(BaseModel):
+    """Response for reset-password."""
+    message: str = "Password has been reset successfully. You can now log in."
+
+
+# ----- Auth -----
+
+
 class LoginRequest(BaseModel):
     email: str
     password: str
