@@ -17,7 +17,6 @@ def event_loop():
 
 @pytest_asyncio.fixture(scope="session")
 async def db_client():
-    from app.core.config import settings
     # Attempt connection
     mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017")
     client = AsyncIOMotorClient(mongo_uri, serverSelectionTimeoutMS=2000)
@@ -59,7 +58,8 @@ async def client(db):
 
     # Ensure app uses the correct DB?
     # app.db.mongo.db should point to 'test_smart_attendance' because of env var.
-    # However, if 'app' was imported before env var was set (unlikely in this setup), it might be wrong.
+    # However, if 'app' was imported before env var was set (unlikely in this setup),
+    # it might be wrong.
 
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac

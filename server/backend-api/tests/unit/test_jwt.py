@@ -1,7 +1,5 @@
 import pytest
 import jwt
-import os
-from datetime import datetime, timedelta, UTC
 from app.utils.jwt_token import create_jwt, decode_jwt
 
 def test_jwt_lifecycle():

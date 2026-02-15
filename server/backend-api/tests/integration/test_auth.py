@@ -16,7 +16,7 @@ async def test_register_teacher_success(client: AsyncClient, db):
     }
 
     # Mock the email service to avoid network calls
-    with patch("app.core.email.BrevoEmailService.send_verification_email", new_callable=AsyncMock) as mock_email:
+    with patch("app.core.email.BrevoEmailService.send_verification_email", new_callable=AsyncMock):
         response = await client.post("/auth/register", json=payload)
 
     # Check database availability
