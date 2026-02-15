@@ -138,7 +138,8 @@ export default function Reports() {
 
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="min-h-screen bg-[var(--bg-primary)] p-6 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
 
       {/* --- HEADER --- */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -341,7 +342,7 @@ export default function Reports() {
             </div>
         )}
       </div>
-
+      </div>
     </div>
   );
 }

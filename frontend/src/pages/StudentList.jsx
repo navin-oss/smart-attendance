@@ -118,7 +118,8 @@ export default function StudentList() {
     .slice(0, 3);
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-[var(--bg-primary)] p-6 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
       
       {/* --- HEADER --- */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -428,6 +429,7 @@ export default function StudentList() {
           )}
         </div>
 
+      </div>
       </div>
     </div>
   );
