@@ -84,26 +84,58 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
+  // Helper function to safely parse a "HH:MM" or "H:MM" time string into minutes since midnight
+  const parseTimeToMinutes = (timeStr) => {
+    if (typeof timeStr !== "string") {
+      return null;
+    }
+
+    const match = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+    if (!match) {
+      return null;
+    }
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+
+    if (
+      Number.isNaN(hours) ||
+      Number.isNaN(minutes) ||
+      hours < 0 ||
+      hours > 23 ||
+      minutes < 0 ||
+      minutes > 59
+    ) {
+      return null;
+    }
+
+    return hours * 60 + minutes;
+  };
+
   // Helper function to get class status based on time
   const getClassStatus = (startTime, endTime) => {
     const now = new Date();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-    const [startHour, startMin] = startTime.split(':').map(Number);
-    const [endHour, endMin] = endTime.split(':').map(Number);
-    const startMinutes = startHour * 60 + startMin;
-    const endMinutes = endHour * 60 + endMin;
+    const startMinutes = parseTimeToMinutes(startTime);
+    const endMinutes = parseTimeToMinutes(endTime);
+
+    if (startMinutes === null || endMinutes === null) {
+      console.error("Invalid time format for class", { startTime, endTime });
+      // Fallback to a safe default that matches existing status values
+      return { status: "upcoming", color: "primary", label: "Upcoming" };
+    }
 
     if (currentMinutes > endMinutes) {
-      return { status: 'completed', color: 'success', label: 'Completed' };
+      return { status: "completed", color: "success", label: "Completed" };
     } else if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
-      return { status: 'live', color: 'warning', label: 'Pending' };
+      return { status: "live", color: "warning", label: "Pending" };
     } else {
       const minutesUntil = startMinutes - currentMinutes;
       return {
-        status: 'upcoming',
-        color: 'primary',
-        label: 'Upcoming',
+        status: "upcoming",
+        color: "primary",
+        label: "Upcoming",
         startsIn: minutesUntil
       };
     }
