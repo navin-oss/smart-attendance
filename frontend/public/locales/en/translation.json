@@ -17,30 +17,6 @@
     "hero_title": "Smart Attendance System",
     "hero_subtitle": "Automate your classroom attendance with face recognition. Secure, fast, and reliable."
   },
-  "register": {
-    "title": "Create Account",
-    "subtitle_start": "Identify your role to get started",
-    "subtitle_role": "Complete your registration as a {{role}}",
-    "role_student": "I am a Student",
-    "role_student_desc": "For attending classes and tracking progress",
-    "role_teacher": "I am a Teacher",
-    "role_teacher_desc": "For managing classes and taking attendance",
-    "back": "Back",
-    "full_name": "Full Name",
-    "email": "Email Address",
-    "college_name": "College Name",
-    "branch": "Branch",
-    "year": "Year",
-    "roll_no": "Roll Number",
-    "employee_id": "Employee ID",
-    "phone": "Phone Number",
-    "password": "Password",
-    "confirm_password": "Confirm Password",
-    "password_placeholder": "Min 6 characters",
-    "confirm_placeholder": "Re-enter password",
-    "submit": "Create Account",
-    "sign_in": "Sign in"
-  },
   "forgot_password": {
     "title_step1": "Reset your password",
     "title_step2": "Verify & Reset",
@@ -334,43 +310,6 @@
     "footer_note": "Older requests are hidden. Adjust filters above to see all previously verified or deleted students.",
     "bottom_note": "Note: Verified students will start appearing in the attendance marking list for their selected subjects and classes. You can revoke access anytime by deleting their entry from the main Students page."
   },
-  "students": {
-    "title": "Students",
-    "subtitle": "Manage and track student enrollment",
-    "export_list": "Export list",
-    "add_student": "Add student",
-    "search_placeholder": "Search by name, roll no...",
-    "select_subject": "Select subject",
-    "sort_by_attendance": "Sort by attendance",
-    "table": {
-        "roll_number": "Roll Number",
-        "student": "Student",
-        "visual_grade": "Visual Grade",
-        "attendance": "Attendance %",
-        "status": "Status",
-        "actions": "Actions"
-    },
-    "filters": {
-       "all": "All",
-       "high": "High (>75%)",
-       "medium": "Medium (50-75%)",
-       "low": "Low (<50%)"
-    }
-  },
-  "mark_attendance": {
-    "title": "Mark Attendance",
-    "subtitle": "Real-time face recognition",
-    "status": {
-        "live": "LIVE",
-        "waking_up": "Starting ML service...",
-        "connecting": "Connecting..."
-    },
-    "alerts": {
-        "already_marked": "Student already marked present!",
-        "success": "Attendance submitted!",
-        "failed": "Submission failed."
-    }
-  },
   "days": {
     "short": {
       "sun": "Sun", "mon": "Mon", "tue": "Tue", "wed": "Wed", "thu": "Thu", "fri": "Fri", "sat": "Sat"
@@ -595,41 +534,42 @@
       "custom": "Custom Message"
     },
     "form": {
-        "subject_class": "Subject/Class",
+        "subject": "Subject",
         "date": "Date",
         "assignment_title": "Assignment Title",
-        "subject": "Subject",
         "due_date": "Due Date",
         "exam_name": "Exam Name",
         "exam_date": "Exam Date",
         "time": "Time",
         "venue": "Venue",
         "message_title": "Message Title",
-        "message": "Message",
-        "placeholders": {
-            "subject_class": "e.g., Mathematics 101",
-            "assignment_title": "e.g., Chapter 5 Homework",
-            "subject": "e.g., Mathematics",
-            "exam_name": "e.g., Midterm Examination",
-            "venue": "e.g., Room 101, Main Building",
-            "message_title": "e.g., Important Announcement",
-            "message": "Type your message here..."
-        },
-        "buttons": {
-            "send_absence": "Send Absence Notification",
-            "send_assignment": "Send Assignment Reminder",
-            "send_exam": "Send Exam Alert",
-            "send_custom": "Send Custom Message"
-        }
+        "message_body": "Message Body",
+        "send_absence": "Send Absence Notification",
+        "send_assignment": "Send Assignment Reminder",
+        "send_exam": "Send Exam Alert",
+        "send_custom": "Send Custom Message"
+    },
+    "placeholders": {
+        "subject": "e.g., Mathematics 101",
+        "assignment_title": "e.g., Chapter 5 Homework",
+        "exam_name": "e.g., Midterm Examination",
+        "venue": "e.g., Room 101, Main Building",
+        "message_title": "e.g., Important Announcement",
+        "message_placeholder": "Type your message here..."
     },
     "recipients": {
         "select": "Select Recipients",
         "select_all": "Select All",
         "deselect_all": "Deselect All",
-        "selected_count": "{{count}} student selected",
-        "selected_count_plural": "{{count}} students selected",
+        "students_selected": "Students Selected",
         "loading": "Loading students...",
         "no_students": "No students found"
+    },
+    "summary": {
+        "title": "Email Send Summary",
+        "total": "Total Emails",
+        "success": "Successfully Sent",
+        "failed": "Failed"
     },
     "alerts": {
         "fill_all": "Please fill in all fields and select at least one student",
