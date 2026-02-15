@@ -1,16 +1,18 @@
-import React, { useState } from "react";
-import { 
-  Bell, 
-  Shield, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
-  Home, 
-  BookOpen, 
-  TrendingUp, 
+import {
+  Bell,
+  Shield,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Home,
+  BookOpen,
+  TrendingUp,
   User,
-  Menu
+  Menu,
+  QrCode
 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useState } from "react";
 import StudentNavigation from "../components/StudentNavigation"
 
 export default function StudentDashboard() {
@@ -47,23 +49,23 @@ export default function StudentDashboard() {
   ];
 
   const [username] = useState(() => {
-      try {
-        const stored = localStorage.getItem("user");
-        return stored ? JSON.parse(stored).name : "";
-      } catch {
-        return "";
-      }
-    });
+    try {
+      const stored = localStorage.getItem("user");
+      return stored ? JSON.parse(stored).name : "";
+    } catch {
+      return "";
+    }
+  });
 
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row font-sans text-slate-800">
-      
+
       <StudentNavigation activePage="home" />
 
       {/* --- MAIN CONTENT AREA --- */}
       <main className="flex-1 md:ml-64 pb-20 md:pb-8">
-        
+
         {/* Header */}
         <header className="px-6 py-5 bg-white border-b border-gray-100 md:bg-transparent md:border-none sticky top-0 z-10 flex justify-between items-center">
           <div>
@@ -77,12 +79,12 @@ export default function StudentDashboard() {
         </header>
 
         <div className="px-6 py-4 space-y-6 max-w-5xl mx-auto">
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
+
             {/* LEFT COLUMN: Stats Cards */}
             <div className="space-y-6">
-              
+
               {/* Hero Card (Attendance) */}
               <div className="bg-blue-600 rounded-3xl p-6 text-white shadow-lg shadow-blue-200 relative overflow-hidden">
                 {/* Background Decor */}
@@ -102,16 +104,16 @@ export default function StudentDashboard() {
 
                   <div className="space-y-2">
                     <p className="text-sm text-blue-50">Keep attending regularly to stay above the 75% rule.</p>
-                    
+
                     {/* Progress Bar */}
                     <div className="h-2 bg-black/20 rounded-full overflow-hidden flex">
                       <div className="h-full bg-emerald-400 w-[78%]"></div>
                       <div className="h-full bg-white/30 flex-1 relative">
-                         {/* Safe Zone Marker */}
-                         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white h-full"></div>
+                        {/* Safe Zone Marker */}
+                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white h-full"></div>
                       </div>
                     </div>
-                    
+
                     <div className="flex justify-between text-[10px] text-blue-200 font-medium uppercase tracking-wide mt-1">
                       <span>Current: 78%</span>
                       <div className="flex items-center gap-1">
@@ -119,6 +121,16 @@ export default function StudentDashboard() {
                         <span>Safe zone: 75%</span>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <Link
+                      to="/student-mark-qr"
+                      className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-700/20"
+                    >
+                      <QrCode size={18} />
+                      Mark with QR
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -151,10 +163,10 @@ export default function StudentDashboard() {
                     <div className="flex items-start gap-4">
                       {/* Timeline Line Visual */}
                       <div className="flex flex-col items-center gap-1 pt-1">
-                         <div className={`w-2 h-2 rounded-full ${item.status === 'Present' ? 'bg-emerald-500' : item.status === 'Absent' ? 'bg-rose-500' : 'bg-slate-300'}`}></div>
-                         <div className="w-0.5 h-8 bg-gray-100 group-last:hidden"></div>
+                        <div className={`w-2 h-2 rounded-full ${item.status === 'Present' ? 'bg-emerald-500' : item.status === 'Absent' ? 'bg-rose-500' : 'bg-slate-300'}`}></div>
+                        <div className="w-0.5 h-8 bg-gray-100 group-last:hidden"></div>
                       </div>
-                      
+
                       <div>
                         <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium uppercase tracking-wide">
                           <Clock size={10} />
@@ -179,7 +191,7 @@ export default function StudentDashboard() {
                   </div>
                 ))}
               </div>
-              
+
               {/* Empty State / End of List Decor */}
               <div className="text-center mt-6">
                 <p className="text-xs text-gray-400">You're all caught up for today!</p>
