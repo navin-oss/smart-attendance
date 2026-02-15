@@ -77,7 +77,9 @@ async def get_attendance_trend(
 
 @router.get("/monthly-summary")
 async def get_monthly_summary(
-    classId: Optional[str] = Query(None, description="Optional class/subject ID filter"),
+    classId: Optional[str] = Query(
+        None, description="Optional class/subject ID filter"
+    ),
 ):
     """
     Get monthly attendance summary aggregated by month.
@@ -123,7 +125,12 @@ async def get_monthly_summary(
                             "$round": [
                                 {
                                     "$multiply": [
-                                        {"$divide": ["$totalPresent", "$totalStudents"]},
+                                        {
+                                            "$divide": [
+                                                "$totalPresent",
+                                                "$totalStudents",
+                                            ]
+                                        },
                                         100,
                                     ]
                                 },
@@ -187,7 +194,12 @@ async def get_class_risk():
                             "$round": [
                                 {
                                     "$multiply": [
-                                        {"$divide": ["$totalPresent", "$totalStudents"]},
+                                        {
+                                            "$divide": [
+                                                "$totalPresent",
+                                                "$totalStudents",
+                                            ]
+                                        },
                                         100,
                                     ]
                                 },

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, UTC, timezone
 import secrets
 import os
 from bson import ObjectId
-from app.utils.jwt_token import create_jwt, create_access_token, create_refresh_token, decode_jwt
+from app.utils.jwt_token import create_access_token, create_refresh_token, decode_jwt
 from urllib.parse import quote
 
 from ...schemas.auth import (
@@ -38,7 +38,9 @@ oauth = OAuth()
 
 @router.post("/register", response_model=RegisterResponse)
 @limiter.limit("5/hour")
-async def register(request: Request, payload: RegisterRequest, background_tasks: BackgroundTasks):
+async def register(
+    request: Request, payload: RegisterRequest, background_tasks: BackgroundTasks
+):
 
     # Check existing user
     existing = await db.users.find_one({"email": payload.email})
@@ -182,7 +184,9 @@ async def login(request: Request, payload: LoginRequest):
         raise HTTPException(status_code=403, detail="Please verify your email first..")
 
     # 4. Generate JWT token
-    access_token = create_access_token(user_id=str(user["_id"]), role=user["role"], email=user["email"])
+    access_token = create_access_token(
+        user_id=str(user["_id"]), role=user["role"], email=user["email"]
+    )
     refresh_token = create_refresh_token(user_id=str(user["_id"]))
 
     return {
@@ -202,16 +206,18 @@ async def refresh_token(request: Request, payload: RefreshTokenRequest):
     try:
         decoded = decode_jwt(payload.refresh_token)
         if decoded.get("type") != "refresh":
-             raise HTTPException(status_code=401, detail="Invalid token type")
-        
+            raise HTTPException(status_code=401, detail="Invalid token type")
+
         user_id = decoded.get("user_id")
         user = await db.users.find_one({"_id": ObjectId(user_id)})
         if not user:
-             raise HTTPException(status_code=401, detail="User not found")
-        
-        access_token = create_access_token(user_id=str(user["_id"]), role=user["role"], email=user["email"])
+            raise HTTPException(status_code=401, detail="User not found")
+
+        access_token = create_access_token(
+            user_id=str(user["_id"]), role=user["role"], email=user["email"]
+        )
         new_refresh_token = create_refresh_token(user_id=str(user["_id"]))
-        
+
         return {
             "user_id": str(user["_id"]),
             "email": user["email"],

@@ -2,7 +2,7 @@ import logging
 import os
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 import sentry_sdk
@@ -70,7 +70,7 @@ async def lifespan(app: FastAPI):
 
 def create_app() -> FastAPI:
     app = FastAPI(title=APP_NAME, lifespan=lifespan)
-    
+
     # Rate limiter
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
