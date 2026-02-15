@@ -54,9 +54,19 @@ const CLASS_BREAKDOWN = [
   { class: 'Grade 11C', students: 29, present: 71, late: 11, absent: 18, color: 'red' },
 ];
 
+// Mock subjects data
+const MOCK_SUBJECTS = [
+  { id: '1', name: 'Mathematics', code: 'MATH101' },
+  { id: '2', name: 'Physics', code: 'PHY201' },
+  { id: '3', name: 'Chemistry', code: 'CHEM201' },
+  { id: '4', name: 'Computer Science', code: 'CS301' },
+  { id: '5', name: 'English Literature', code: 'ENG101' },
+];
+
 export default function Analytics() {
   const [selectedPeriod, setSelectedPeriod] = useState("Month");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState("all");
   const dropdownRef = useRef(null);
 
   const periodOptions = ["Week", "Month", "Semester"];
@@ -91,9 +101,28 @@ export default function Analytics() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-[var(--text-main)]">Analytics</h2>
-          <p className="text-[var(--text-body)]">Track attendance trends over time and compare classes</p>
+          <p className="text-[var(--text-body)]">
+            {selectedSubject === "all" 
+              ? "Global Overview - Track attendance trends across all subjects" 
+              : `Performance for ${MOCK_SUBJECTS.find(s => s.id === selectedSubject)?.name || 'Subject'}`
+            }
+          </p>
         </div>
         <div className="flex items-center gap-3">
+          {/* Subject Selector Dropdown */}
+          <select
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            className="px-4 py-2 bg-[var(--bg-card)] text-[var(--text-main)] border border-[var(--border-color)] rounded-lg hover:bg-[var(--bg-secondary)] font-medium shadow-sm transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+          >
+            <option value="all">All Subjects</option>
+            {MOCK_SUBJECTS.map((subject) => (
+              <option key={subject.id} value={subject.id}>
+                {subject.name} ({subject.code})
+              </option>
+            ))}
+          </select>
+
           <button className="px-4 py-2 bg-[var(--primary)] text-[var(--text-on-primary)] rounded-lg hover:bg-[var(--primary-hover)] font-medium flex items-center gap-2 shadow-sm transition cursor-pointer">
             <Download size={18} />
             Export analytics
