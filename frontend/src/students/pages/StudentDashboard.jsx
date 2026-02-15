@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { 
   Bell, 
   Shield, 
@@ -14,6 +15,12 @@ import {
 import StudentNavigation from "../components/StudentNavigation"
 
 export default function StudentDashboard() {
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
   // Mock Data for Today's Schedule
   const schedule = [
     {
@@ -46,6 +53,12 @@ export default function StudentDashboard() {
     },
   ];
 
+  const currentDate = new Date().toLocaleDateString(i18n.language, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  });
+
   const [username] = useState(() => {
       try {
         const stored = localStorage.getItem("user");
@@ -67,13 +80,33 @@ export default function StudentDashboard() {
         {/* Header */}
         <header className="px-6 py-5 bg-white border-b border-gray-100 md:bg-transparent md:border-none sticky top-0 z-10 flex justify-between items-center">
           <div>
-            <p className="text-xs text-gray-500 font-medium md:hidden">Student portal</p>
-            <h1 className="text-xl md:text-2xl font-bold text-slate-900">Hi, {username} 👋</h1>
+            <p className="text-xs text-gray-500 font-medium md:hidden">{t('student_dashboard.portal_name')}</p>
+            <h1 className="text-xl md:text-2xl font-bold text-slate-900">{t('student_dashboard.welcome', { name: username })}</h1>
           </div>
-          <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition relative">
-            <Bell size={22} />
-            <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-          </button>
+
+          <div className="flex items-center gap-4">
+            {/* Language Switcher */}
+            <div className="flex gap-2 items-center bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
+              <button 
+                onClick={() => changeLanguage('en')} 
+                className={`text-xs ${i18n.language === 'en' ? 'font-bold text-blue-900 border-b-2 border-blue-900' : 'text-gray-400 hover:text-gray-600'}`}
+              >
+                English
+              </button>
+              <span className="text-gray-300 text-xs">|</span>
+              <button 
+                onClick={() => changeLanguage('hi')} 
+                className={`text-xs ${i18n.language === 'hi' ? 'font-bold text-blue-900 border-b-2 border-blue-900' : 'text-gray-400 hover:text-gray-600'}`}
+              >
+                हिंदी
+              </button>
+            </div>
+
+            <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition relative">
+              <Bell size={22} />
+              <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+            </button>
+          </div>
         </header>
 
         <div className="px-6 py-4 space-y-6 max-w-5xl mx-auto">
@@ -92,16 +125,16 @@ export default function StudentDashboard() {
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-6">
                     <div>
-                      <p className="text-blue-100 text-sm font-medium">Overall attendance</p>
+                      <p className="text-blue-100 text-sm font-medium">{t('student.myAttendance')}</p>
                       <h2 className="text-5xl font-bold mt-1">78%</h2>
                     </div>
                     <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold border border-white/10">
-                      On track
+                      {t('student_dashboard.stats.on_track')}
                     </span>
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-sm text-blue-50">Keep attending regularly to stay above the 75% rule.</p>
+                    <p className="text-sm text-blue-50">{t('student_dashboard.stats.keep_attending')}</p>
                     
                     {/* Progress Bar */}
                     <div className="h-2 bg-black/20 rounded-full overflow-hidden flex">
@@ -113,10 +146,10 @@ export default function StudentDashboard() {
                     </div>
                     
                     <div className="flex justify-between text-[10px] text-blue-200 font-medium uppercase tracking-wide mt-1">
-                      <span>Current: 78%</span>
+                      <span>{t('student_dashboard.stats.current')}: 78%</span>
                       <div className="flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                        <span>Safe zone: 75%</span>
+                        <span>{t('student_dashboard.stats.safe_zone_label', { percent: 75 })}</span>
                       </div>
                     </div>
                   </div>
@@ -129,9 +162,9 @@ export default function StudentDashboard() {
                   <Shield size={20} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-800">You need 3 more classes</h3>
+                  <h3 className="text-sm font-bold text-slate-800">{t('student_dashboard.stats.need_classes_title', { count: 3 })}</h3>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Attend the next 3 scheduled classes to reach the safe 80% attendance zone buffer.
+                    {t('student_dashboard.stats.need_classes_desc', { count: 3, percent: 80 })}
                   </p>
                 </div>
               </div>
@@ -141,8 +174,8 @@ export default function StudentDashboard() {
             {/* RIGHT COLUMN: Schedule List */}
             <div>
               <div className="flex justify-between items-end mb-4">
-                <h3 className="text-lg font-bold text-slate-800">Today</h3>
-                <span className="text-xs font-medium text-gray-400">Monday, 12 August</span>
+                <h3 className="text-lg font-bold text-slate-800">{t('student_dashboard.schedule.today')}</h3>
+                <span className="text-xs font-medium text-gray-400">{currentDate}</span>
               </div>
 
               <div className="space-y-3">
@@ -167,13 +200,13 @@ export default function StudentDashboard() {
                     {/* Status Pill */}
                     <div>
                       {item.status === "Present" && (
-                        <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">Present</span>
+                        <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">{t('student_dashboard.schedule.status_present')}</span>
                       )}
                       {item.status === "Absent" && (
-                        <span className="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-bold">Absent</span>
+                        <span className="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-bold">{t('student_dashboard.schedule.status_absent')}</span>
                       )}
                       {item.status === "Upcoming" && (
-                        <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-bold">Upcoming</span>
+                        <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-bold">{t('student_dashboard.schedule.status_upcoming')}</span>
                       )}
                     </div>
                   </div>
@@ -182,7 +215,7 @@ export default function StudentDashboard() {
               
               {/* Empty State / End of List Decor */}
               <div className="text-center mt-6">
-                <p className="text-xs text-gray-400">You're all caught up for today!</p>
+                <p className="text-xs text-gray-400">{t('student_dashboard.schedule.all_caught_up')}</p>
               </div>
             </div>
 

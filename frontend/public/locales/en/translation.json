@@ -1,4 +1,128 @@
 {
+  "auth": {
+    "signInTitle": "Sign in to your account",
+    "emailLabel": "Email Address"
+  },
+  "student": {
+    "myAttendance": "My Attendance"
+  },
+  "student_dashboard": {
+    "nav": {
+      "home": "Home",
+      "subjects": "Subjects",
+      "forecast": "Forecast",
+      "profile": "Profile",
+      "app_name": "Smart Attendance",
+      "student_role": "Student"
+    },
+    "portal_name": "Student Portal",
+    "welcome": "Welcome back, {{name}}",
+    "stats": {
+      "on_track": "On Track",
+      "keep_attending": "Keep attending classes to maintain your record.",
+      "current": "Current",
+      "safe_zone_label": "Safe Zone (>{{percent}}%)",
+      "need_classes_title": "Need {{count}} more classes",
+      "need_classes_desc": "Attend next {{count}} classes to reach {{percent}}% target."
+    },
+    "schedule": {
+      "today": "Today's Schedule",
+      "status_present": "Present",
+      "status_absent": "Absent",
+      "status_upcoming": "Upcoming",
+      "all_caught_up": "You're all caught up for today!"
+    }
+  },
+  "subjects": {
+    "title": "Subjects",
+    "subtitle": "Attendance overview by subject",
+    "no_subjects": "No subjects enrolled yet.",
+    "attendance_label": "Attendance",
+    "attended_stats": "Attended: {{attended}}/{{total}} classes ({{percentage}}%)",
+    "status": {
+      "on_track": "On track",
+      "at_risk": "At risk",
+      "near_threshold": "Near threshold",
+      "critical": "Attendance is critical",
+      "stay_regular": "Stay regular to keep 75%+",
+      "safe_rule": "Safe above 75% rule",
+      "need_more": "Need {{needed}} more classes to reach 75%"
+    },
+    "types": {
+      "Lab": "Lab",
+      "Elective": "Elective",
+      "Theory": "Theory",
+      "Core": "Core"
+    },
+    "errors": {
+      "load_failed": "Failed to load subjects"
+    }
+  },
+  "forecast": {
+    "title": "History & forecast",
+    "subtitle": "See how attendance impacts eligibility",
+    "info_card": {
+      "title": "How attendance affects you",
+      "desc": "Most exams require at least 75% attendance to be eligible for finals.",
+      "below_75": "Below 75%:",
+      "below_75_desc": "You may not be allowed to write exams.",
+      "range_75_85": "75-85%:",
+      "range_75_85_desc": "You are in a safe but watchful zone.",
+      "above_85": "Above 85%:",
+      "above_85_desc": "You are comfortably eligible."
+    },
+    "simulation": {
+      "title": "Forecast your score",
+      "subtitle": "Plan your next classes and see how your overall percentage changes.",
+      "badge": "Simulation",
+      "slider_label": "If I attend the next number of classes",
+      "classes_count": "{{count}} classes",
+      "expected_score": "Expected Score",
+      "current_score": "Current score",
+      "after_attending": "After attending",
+      "needed_for_75": "Classes needed for 75%",
+      "more_classes": "{{count}} more",
+      "eligible": "Eligible for finals",
+      "not_eligible": "Not yet eligible",
+      "eligible_desc": "You will be safely above the 75% rule.",
+      "not_eligible_desc": "You need to attend more classes to reach the safe zone.",
+      "disclaimer": "This is an estimate based on current data. Actual values may change if future classes are cancelled or rescheduled."
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Upload your face image and review your details",
+    "loading": "Loading Profile...",
+    "error": "Error loading profile: {{message}}",
+    "not_found": "No Profile found..",
+    "roll_no": "Roll no",
+    "edit_details": "Edit details",
+    "year": "Year",
+    "branch": "Branch",
+    "email": "Email",
+    "face_image": {
+      "title": "Face image for attendance",
+      "desc": "Upload a clear, high-quality photo. This will be used for face recognition during attendance.",
+      "replace": "Replace photo",
+      "upload": "Upload photo",
+      "tips": "Tips: Use good lighting, look straight at the camera, avoid masks, caps, or filters."
+    },
+    "summary": {
+      "title": "Attendance summary",
+      "this_semester": "This semester",
+      "overall": "Overall percentage",
+      "attended": "Classes attended",
+      "total": "Total conducted",
+      "on_track": "On track for finals"
+    },
+    "subjects_card": {
+      "title": "Subjects",
+      "desc": "Keep your current subjects up to date for accurate attendance reports.",
+      "add_btn": "Add subject",
+      "modal_title": "Add Subject",
+      "cancel": "Cancel"
+    }
+  },
   "welcome": "Welcome",
   "login": {
     "title": "Welcome",
@@ -15,7 +139,10 @@
     "no_account": "Don't have an account yet?",
     "register_link": "Register for free",
     "hero_title": "Smart Attendance System",
-    "hero_subtitle": "Automate your classroom attendance with face recognition. Secure, fast, and reliable."
+    "hero_subtitle": "Automate your classroom attendance with face recognition. Secure, fast, and reliable.",
+    "alerts": {
+       "login_failed": "Login failed. Please check your credentials."
+    }
   },
   "forgot_password": {
     "title_step1": "Reset your password",
@@ -74,9 +201,14 @@
     "submit": "Create Account",
     "submitting": "Creating...",
     "already_have_account": "Already have an account?",
-    "sign_in": "Sign in"
+    "sign_in": "Sign in",
+    "alerts": {
+      "account_created": "Account created! Please check your email to verify before logging in.",
+      "failed": "Registration Failed"
+    }
   },
   "nav": {
+    "overview": "Overview",
     "dashboard": "Dashboard",
     "attendance": "Attendance",
     "students": "Students",
@@ -86,6 +218,7 @@
     "messaging": "Messaging"
   },
   "dashboard": {
+    "startAttendance": "Start Attendance",
     "title": "Teacher dashboard",
     "subtitle": "Overview of today's attendance and upcoming classes",
     "download_report": "Download report",
@@ -128,7 +261,9 @@
       "pending": "Pending",
       "starts_in": "Starts in 30 min",
       "not_started": "Attendance not started"
-    }
+    },
+    "next_class": "Next class: {{class}} • {{time}}",
+    "room": "Room {{room}}"
   },
   "mark_attendance": {
     "title": "Start attendance session",
@@ -309,6 +444,38 @@
     "confirm_delete": "Remove this student from subject?",
     "footer_note": "Older requests are hidden. Adjust filters above to see all previously verified or deleted students.",
     "bottom_note": "Note: Verified students will start appearing in the attendance marking list for their selected subjects and classes. You can revoke access anytime by deleting their entry from the main Students page."
+  },
+  "student_dashboard": {
+    "welcome": "Hi, {{name}} 👋",
+    "portal_name": "Student portal",
+    "stats": {
+      "overall_attendance": "Overall attendance",
+      "on_track": "On track",
+      "at_risk": "At risk",
+      "keep_attending": "Keep attending regularly to stay above the 75% rule.",
+      "current": "Current",
+      "safe_zone_label": "Safe zone: {{percent}}%",
+      "need_classes_title": "You need {{count}} more classes",
+      "need_classes_desc": "Attend the next {{count}} scheduled classes to reach the safe {{percent}}% attendance zone buffer."
+    },
+    "schedule": {
+      "today": "Today",
+      "present": "Present",
+      "absent": "Absent",
+      "upcoming": "Upcoming",
+      "all_caught_up": "You're all caught up for today!",
+      "status_present": "Present",
+      "status_absent": "Absent",
+      "status_upcoming": "Upcoming"
+    },
+    "nav": {
+      "home": "Home",
+      "subjects": "Subjects",
+      "forecast": "Forecast",
+      "profile": "Profile",
+      "app_name": "Smart Attend",
+      "student_role": "Student"
+    }
   },
   "days": {
     "short": {

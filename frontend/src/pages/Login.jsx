@@ -40,7 +40,7 @@ export default function Login() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.detail || "Login failed");
+        throw new Error(data.detail || t('alerts.login_failed'));
       }
 
       const data = await res.json();
@@ -78,7 +78,7 @@ export default function Login() {
             {/* Header */}
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-[var(--text-main)] text-center">{t('login.title')}</h1>
+                <h1 className="text-3xl font-bold text-[var(--text-main)] text-center">{t('auth.signInTitle')}</h1>
                 {/* Language Switcher */}
                 <div className="flex gap-2">
                   <button 
@@ -122,7 +122,7 @@ export default function Login() {
 
                 {/* Email Input */}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-[var(--text-body)]">{t('login.email_label')}</label>
+                  <label className="text-sm font-semibold text-[var(--text-body)]">{t('auth.emailLabel')}</label>
                   <div className="relative">
                     <input
                       type="email"

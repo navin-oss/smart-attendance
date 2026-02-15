@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 /** Navigation link definitions for the main header. */
 const navLinks = [
-  { to: "/dashboard", label: "dashboard" },
+  { to: "/dashboard", label: "overview" },
   { to: "/attendance", label: "attendance" },
   { to: "/students", label: "students" },
   { to: "/analytics", label: "analytics" },

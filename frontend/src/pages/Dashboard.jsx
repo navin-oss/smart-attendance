@@ -102,7 +102,7 @@ export default function Dashboard() {
             </button>
             <Link to="/start-attendance" className="hover:bg-[var(--primary-hover)] px-4 py-2 bg-[var(--primary)] text-[var(--text-on-primary)] rounded-lg hover:bg-[var(--primary-hover)] font-medium shadow-sm flex items-center gap-2 transition-colors">
               <Play size={18} fill="currentColor" />
-              {t('dashboard.start_attendance')}
+              {t('dashboard.startAttendance')}
             </Link>
           </div>
         </div>
@@ -118,11 +118,11 @@ export default function Dashboard() {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-xl font-bold text-[var(--text-main)]">{t('dashboard.greeting', { name: user?.name || "Teacher" })}</h2>
-                  <p className=" text-sm text-[var(--text-body)] opacity-80">Monday, September 23 • 08:45</p>
+                  <p className=" text-sm text-[var(--text-body)] opacity-80">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="px-3 py-1 bg-[var(--bg-secondary)] text-[var(--text-body)] rounded-full font-medium">Next class: Grade 10A • 09:00</span>
-                  <span className="px-3 py-1 bg-[var(--bg-secondary)] text-[var(--text-body)] rounded-full font-medium">Room 203</span>
+                  <span className="px-3 py-1 bg-[var(--bg-secondary)] text-[var(--text-body)] rounded-full font-medium">{t('dashboard.next_class', { class: 'Grade 10A', time: '09:00' })}</span>
+                  <span className="px-3 py-1 bg-[var(--bg-secondary)] text-[var(--text-body)] rounded-full font-medium">{t('dashboard.room', { room: '203' })}</span>
                 </div>
               </div>
 

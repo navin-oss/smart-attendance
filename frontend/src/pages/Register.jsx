@@ -78,10 +78,10 @@ export default function Register() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.detail || "Registration Failed");
+        throw new Error(data.detail || t('register.alerts.failed'));
       }
 
-      alert("Account created! Please check your email to verify before logging in.");
+      alert(t('register.alerts.account_created'));
       navigate("/login");
     }
     catch (err) {
@@ -173,7 +173,7 @@ export default function Register() {
 
                 {/* Common: Email */}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-[var(--text-main)]">{t('register.email')}</label>
+                  <label className="text-sm font-semibold text-[var(--text-main)]">{t('auth.emailLabel')}</label>
                   <div className="relative">
                     <input
                       type="email"
