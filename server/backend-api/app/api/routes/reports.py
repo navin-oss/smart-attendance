@@ -76,7 +76,7 @@ async def _get_subject_and_validate(subject_id: str, current_teacher: dict):
     if not subject:
         raise HTTPException(status_code=404, detail="Subject not found")
 
-    teacher_id = current_teacher.get("id") or current_teacher.get("_id")
+    teacher_id = current_teacher["id"]
     professor_ids = [str(pid) for pid in subject.get("professor_ids", [])]
 
     # Also check "teacher_id" field in case the schema uses that instead
@@ -100,12 +100,24 @@ async def _get_attendance_and_students(
     """
     query = {"subject_id": ObjectId(subject_id)}
 
-    if start_date and end_date:
-        query["date"] = {"$gte": start_date, "$lte": end_date}
-    elif start_date:
-        query["date"] = {"$gte": start_date}
-    elif end_date:
-        query["date"] = {"$lte": end_date}
+    # Convert string dates to datetime objects for proper MongoDB comparison.
+    # The DB may store dates as datetime objects, so string comparison would
+    # silently return zero results.
+    date_filter = {}
+    if start_date:
+        try:
+            date_filter["$gte"] = datetime.strptime(start_date, "%Y-%m-%d")
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            # Set to end of day so the entire last day is included
+            end_dt = datetime.strptime(end_date, "%Y-%m-%d")
+            date_filter["$lte"] = end_dt.replace(hour=23, minute=59, second=59)
+        except ValueError:
+            pass
+    if date_filter:
+        query["date"] = date_filter
 
     attendance_records = await (
         db.attendance.find(query)
@@ -264,7 +276,12 @@ async def export_attendance_pdf(
             student_id_str = str(record.get("student_id", ""))
             student = students.get(student_id_str, {})
 
-            date_str = record.get("date", "N/A")
+            date_val = record.get("date", "N/A")
+            date_str = (
+                date_val.strftime("%Y-%m-%d")
+                if isinstance(date_val, datetime)
+                else str(date_val)
+            )
             name = html.escape(student.get("name", "Unknown"))
             roll = html.escape(
                 str(student.get("roll", student.get("roll_number", "N/A")))
@@ -414,8 +431,15 @@ async def export_attendance_csv(
             student_id_str = str(record.get("student_id", ""))
             student = students.get(student_id_str, {})
 
+            date_val = record.get("date", "N/A")
+            date_str = (
+                date_val.strftime("%Y-%m-%d")
+                if isinstance(date_val, datetime)
+                else str(date_val)
+            )
+
             writer.writerow([
-                _sanitize_csv_value(str(record.get("date", "N/A"))),
+                _sanitize_csv_value(date_str),
                 _sanitize_csv_value(student.get("name", "Unknown")),
                 _sanitize_csv_value(
                     str(student.get("roll", student.get("roll_number", "N/A")))
