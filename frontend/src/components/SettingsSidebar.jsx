@@ -14,7 +14,7 @@ export default function SettingsSidebar({ activeTab, setActiveTab, onLogout}) {
   ];
 
   return (
-    <div className="w-full md:w-64 flex-shrink-0 bg-white md:bg-transparent rounded-xl border md:border-none border-gray-100 shadow-sm md:shadow-none p-2 md:p-0">
+    <aside className="w-full md:w-64 flex-shrink-0 bg-white md:bg-transparent rounded-xl border md:border-none border-gray-100 shadow-sm md:shadow-none p-2 md:p-0">
       <div className="space-y-1">
         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3 px-3 hidden md:block">
           {t('settings.sidebar.heading')}
