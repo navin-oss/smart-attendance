@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Megaphone } from "lucide-react";
 
 export default function BroadcastPreview({ title, message }) {
@@ -36,3 +37,8 @@ export default function BroadcastPreview({ title, message }) {
     </div>
   );
 }
+
+BroadcastPreview.propTypes = {
+  title: PropTypes.string,
+  message: PropTypes.string,
+};

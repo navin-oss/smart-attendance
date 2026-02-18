@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { X, Calendar, Plus, Edit2, Trash2, Save, Loader2 } from "lucide-react";
 import { getExams, addExam, updateExam, deleteExam } from "../api/schedule";
 
@@ -258,3 +259,7 @@ export default function ExamDaysModal({ onClose }) {
     </div>
   );
 }
+
+ExamDaysModal.propTypes = {
+  onClose: PropTypes.func.isRequired,
+};

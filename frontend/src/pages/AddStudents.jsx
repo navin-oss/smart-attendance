@@ -3,18 +3,11 @@ import {
   Search, 
   RefreshCw, 
   CheckCircle, 
-  LayoutDashboard, 
-  CalendarCheck, 
-  Users, 
-  BarChart2, 
-  FileText, 
-  UserPlus, 
-  LogOut,
   ChevronDown,
   Check,
   X,
-  User
 } from "lucide-react";
+import PropTypes from "prop-types";
 import { fetchMySubjects, fetchSubjectStudents, verifyStudent, deleteStudent } from "../api/teacher";
 
 export default function AddStudents() {
@@ -258,7 +251,7 @@ export default function AddStudents() {
 }
 
 // Simple Helper Component for Sidebar Items
-// eslint-disable-next-line no-unused-vars
+
 function NavItem({ icon: IconComp, label }) {
   return (
     <button className="w-full flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors">
@@ -267,3 +260,8 @@ function NavItem({ icon: IconComp, label }) {
     </button>
   );
 }
+
+NavItem.propTypes = {
+  icon: PropTypes.elementType.isRequired,
+  label: PropTypes.string.isRequired,
+};

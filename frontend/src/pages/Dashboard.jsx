@@ -89,7 +89,7 @@ export default function Dashboard() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-(--text-main)">Teacher dashboard</h1>
-            <p className="text-(--text-body) mt-1">Overview of today's attendance and upcoming classes</p>
+            <p className="text-(--text-body) mt-1">Overview of today&apos;s attendance and upcoming classes</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -146,7 +146,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Stat 1 */}
               <div className="bg-blue-600 text-white rounded-2xl p-5 relative overflow-hidden">
-                <p className="text-blue-100 text-sm font-medium mb-1">Today's attendance rate</p>
+                <p className="text-blue-100 text-sm font-medium mb-1">Today&apos;s attendance rate</p>
                 <div className="flex items-end justify-between">
                   <h3 className="text-3xl font-bold">94%</h3>
                   <span className="text-xs bg-blue-500/50 px-2 py-1 rounded text-blue-50">+3% vs last week</span>

@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Body
+from fastapi import APIRouter, Depends, HTTPException
 from app.api.deps import get_current_teacher
 from app.db.mongo import db
 from app.schemas.schedule import ExamOverride
 from typing import List
-from uuid import UUID, uuid4
-from bson import ObjectId
+from uuid import UUID
 
 router = APIRouter()
 

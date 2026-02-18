@@ -104,7 +104,7 @@ export default function ManageSchedule() {
     return date.toLocaleString('default', { month: 'long', year: 'numeric' });
   };
 
-  const fetchSchedule = async () => {
+  const fetchSchedule = React.useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -125,11 +125,11 @@ export default function ManageSchedule() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []); // Empty dependency array as getSettings and loadSchedule are stable or defined outside
 
   useEffect(() => {
     fetchSchedule();
-  }, []);
+  }, [fetchSchedule]);
   useEffect(() => {
     const savedTemplates = localStorage.getItem("schedule_templates");
 
