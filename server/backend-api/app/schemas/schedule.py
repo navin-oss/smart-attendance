@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional, Dict
 from datetime import date
+from uuid import UUID, uuid4
 
 
 class ClassMetadata(BaseModel):
@@ -36,6 +37,7 @@ class Holiday(BaseModel):
 
 
 class ExamOverride(BaseModel):
+    id: UUID = Field(default_factory=uuid4)
     date: date
     name: Optional[str] = None
     periods: Optional[List[Period]] = None

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { Megaphone, Send, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function BroadcastForm({ title, setTitle, message, setMessage }) {
@@ -131,3 +132,10 @@ export default function BroadcastForm({ title, setTitle, message, setMessage }) 
     </div>
   );
 }
+
+BroadcastForm.propTypes = {
+  title: PropTypes.string.isRequired,
+  setTitle: PropTypes.func.isRequired,
+  message: PropTypes.string.isRequired,
+  setMessage: PropTypes.func.isRequired,
+};
