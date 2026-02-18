@@ -18,10 +18,12 @@ import {
 } from "lucide-react";
 import { getSettings, updateSettings } from "../api/schedule";
 import Spinner from "../components/Spinner";
+import ExamDaysModal from "../components/ExamDaysModal";
 
 export default function ManageSchedule() {
   const [templates, setTemplates] = useState([]);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showExamModal, setShowExamModal] = useState(false);
   const [activeDay, setActiveDay] = useState("Mon");
   const [isLoading, setIsLoading] = useState(true);
   const [scheduleData, setScheduleData] = useState([]);
@@ -55,6 +57,17 @@ export default function ManageSchedule() {
     }
     return daysArray;
   };
+
+  const getExamDaysMap = () => {
+    return (scheduleEnvelope.exams || []).reduce((acc, exam) => {
+      if (exam.date) {
+        const dateStr = typeof exam.date === 'string' ? exam.date.split("T")[0] : "";
+        if (dateStr) acc[dateStr] = exam.name;
+      }
+      return acc;
+    }, {});
+  };
+  const examDaysMap = getExamDaysMap();
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
   };
@@ -90,29 +103,31 @@ export default function ManageSchedule() {
   const formatMonthYear = (date) => {
     return date.toLocaleString('default', { month: 'long', year: 'numeric' });
   };
+
+  const fetchSchedule = async () => {
+    try {
+      setIsLoading(true);
+
+      const data = await getSettings();
+
+      const scheduleData = data.schedule || {
+        timetable: [],
+        recurring: null,
+        holidays: [],
+        exams: [],
+        meta: {},
+      };
+      loadSchedule(scheduleData);
+      setScheduleEnvelope(scheduleData);
+    } catch (err) {
+      console.error(err);
+      alert("Error loading schedule");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchSchedule = async () => {
-      try {
-        setIsLoading(true);
-
-        const data = await getSettings();
-
-        const scheduleData = data.schedule || {
-          timetable: [],
-          recurring: null,
-          holidays: [],
-          exams: [],
-          meta: {},
-        };
-        loadSchedule(scheduleData);
-        setScheduleEnvelope(scheduleData);
-      } catch (err) {
-        console.error(err);
-        alert("Error loading schedule");
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchSchedule();
   }, []);
   useEffect(() => {
@@ -190,6 +205,14 @@ export default function ManageSchedule() {
     }
   };
   const filteredClasses = scheduleData.filter((item) => item.day === activeDay);
+
+  // Logic Override: Check if today is an exam day and matches activeDay
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const todayDay = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][today.getDay()];
+  const todayExam = examDaysMap[todayKey];
+  const isExamDayView = todayExam && activeDay === todayDay;
+
   const handleAddClass = () => {
     const newClass = {
       id: Date.now(),
@@ -519,7 +542,19 @@ export default function ManageSchedule() {
             </div>
 
             {/* --- DYNAMIC CLASSES GRID --- */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* Exam Day Banner */}
+            {isExamDayView && (
+               <div className="bg-purple-100 border-l-4 border-purple-500 text-purple-700 p-4 mb-6 rounded-xl shadow-sm flex items-center gap-3 animate-in slide-in-from-top duration-300">
+                  <CalendarIcon className="w-6 h-6 flex-shrink-0" />
+                  <div>
+                     <p className="font-bold text-lg">Exam Day: {todayExam}</p>
+                     <p className="text-sm">Regular classes are suspended/hidden for today.</p>
+                  </div>
+               </div>
+            )}
+
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${isExamDayView ? "opacity-50 grayscale pointer-events-none" : ""}`}>
               {filteredClasses.map((cls) => (
                 <div
                   key={cls.id}
@@ -668,11 +703,30 @@ export default function ManageSchedule() {
                   if(!day) return <div key={idx} className="h-8 w-8"/>;
                   const today = new Date();
                   const isToday = day === today.getDate() && currentDate.getMonth() === today.getMonth() && currentDate.getFullYear() === today.getFullYear();
+
+                  const d = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                  const year = d.getFullYear();
+                  const month = String(d.getMonth() + 1).padStart(2, '0');
+                  const dayStr = String(d.getDate()).padStart(2, '0');
+                  const dateKey = `${year}-${month}-${dayStr}`;
+                  const examName = examDaysMap[dateKey];
+
                   return (
-                    <div key={idx} className="flex justify-center">
-                      <span className={`h-8 w-8 flex items-center justify-center rounded-lg transition cursor-pointer ${isToday ? "bg-[var(--primary)] text-white font-bold shadow-md" : "text-[var(--text-main)] hover:bg-[var(--bg-secondary)]"}`}>
+                    <div key={idx} className="flex justify-center group relative">
+                      <span
+                        className={`h-8 w-8 flex items-center justify-center rounded-lg transition cursor-pointer
+                        ${isToday ? "bg-[var(--primary)] text-white font-bold shadow-md" :
+                          examName ? "bg-purple-100 text-purple-700 font-bold border border-purple-200" :
+                          "text-[var(--text-main)] hover:bg-[var(--bg-secondary)]"}`}
+                        title={examName || ""}
+                      >
                         {day}
                       </span>
+                      {examName && (
+                        <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-black/80 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap z-10">
+                          {examName}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -695,7 +749,10 @@ export default function ManageSchedule() {
               </div>
 
               {/* Exam Days */}
-              <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-color)] flex items-center justify-between cursor-pointer hover:bg-[var(--bg-secondary)] transition">
+              <div
+                onClick={() => setShowExamModal(true)}
+                className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-color)] flex items-center justify-between cursor-pointer hover:bg-[var(--bg-secondary)] transition"
+              >
                 <div>
                   <h4 className="font-bold text-[var(--text-main)] text-sm">
                     Exam days
@@ -725,6 +782,15 @@ export default function ManageSchedule() {
             </div>
           </div>
         </div>
+        {showExamModal && (
+          <ExamDaysModal
+            onClose={() => {
+              setShowExamModal(false);
+              fetchSchedule();
+            }}
+          />
+        )}
+
         {showTemplates && (
           <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
             <div className="bg-[var(--bg-card)] w-full max-w-2xl p-6 rounded-2xl border border-[var(--border-color)] shadow-xl">

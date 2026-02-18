@@ -10,6 +10,7 @@ from app.api.routes import teacher_settings as settings_router
 from .api.routes.attendance import router as attendance_router
 from .api.routes.auth import router as auth_router
 from .api.routes.students import router as students_router
+from .api.routes.schedule import router as schedule_router
 from .core.config import APP_NAME
 from app.services.attendance_daily import (
     ensure_indexes as ensure_attendance_daily_indexes,
@@ -72,6 +73,7 @@ def create_app() -> FastAPI:
     app.include_router(students_router)
     app.include_router(attendance_router)
     app.include_router(settings_router.router)
+    app.include_router(schedule_router, prefix="/api/schedule", tags=["schedule"])
 
     return app
 
